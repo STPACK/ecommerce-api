@@ -17,22 +17,32 @@ export class ProductsService {
     const product = this.productsRepository.create(createProductDto);
     return this.productsRepository.save(product);
   }
+
   async findAll(query: QueryProductsDto) {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
     const search = query.search || '';
+    const sortBy = query.sortBy || 'createdAt';
+    const sortOrder = query.sortOrder || 'DESC';
 
     const [items, total] = await this.productsRepository.findAndCount({
       where: search ? { name: Like(`%${search}%`) } : {},
+      order: { [sortBy]: sortOrder },
       skip: (page - 1) * limit,
       take: limit,
     });
 
+    const totalPages = Math.ceil(total / limit);
+
     return {
       items,
-      total,
-      page,
-      limit,
+      meta: {
+        totalItems: total,
+        itemCount: items.length,
+        itemsPerPage: limit,
+        totalPages,
+        currentPage: page,
+      },
     };
   }
 

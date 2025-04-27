@@ -1,4 +1,4 @@
-import { IsOptional, IsNumberString, IsString } from 'class-validator';
+import { IsOptional, IsNumberString, IsString, IsIn } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class QueryProductsDto {
@@ -12,8 +12,26 @@ export class QueryProductsDto {
   @IsNumberString()
   limit?: number;
 
-  @ApiPropertyOptional({ example: 'iphone', description: 'Search keyword' })
+  @ApiPropertyOptional({ example: '', description: 'Search keyword' })
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiPropertyOptional({
+    example: 'createdAt',
+    description: 'Sort by field',
+    enum: ['name', 'price', 'createdAt', 'updatedAt'],
+  })
+  @IsOptional()
+  @IsIn(['name', 'price', 'createdAt', 'updatedAt'])
+  sortBy?: 'name' | 'price' | 'createdAt' | 'updatedAt';
+
+  @ApiPropertyOptional({
+    example: 'DESC',
+    description: 'Sort order',
+    enum: ['ASC', 'DESC'],
+  })
+  @IsOptional()
+  @IsIn(['ASC', 'DESC'])
+  sortOrder?: 'ASC' | 'DESC';
 }
